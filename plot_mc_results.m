@@ -28,8 +28,8 @@ for K = 1:nbins
     labels_emp = empirical.origin_labels;
     labels_cell = {random_cell.origin_labels};
     
-    target_emp = empirical.target_labels;
-    target_cell = {random_cell.target_labels};
+%     target_emp = empirical.target_labels;
+%     target_cell = {random_cell.target_labels};
     
     %filter by temporal bin
 %     filter = @(x) (x.centers > left(K) & x.centers <= right(K));

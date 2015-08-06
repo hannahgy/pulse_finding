@@ -84,9 +84,7 @@ for e = 1:numel(pulse)
         [n{ cellfun(@isempty,n) }] = deal(NaN);
         % Put into larger cell array
         nearIDs(:,i) = n;
-        if cellfun(@(x) any(isempty(x)),nearIDs)
-            keyboard
-        end
+        
     end
     
     % Put all data into subsliced Fitted array
