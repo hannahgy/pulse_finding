@@ -1,24 +1,19 @@
 %% Nearby pulse analysis
 
-% for n = 1:20
-
-% [fits_bs,cells_bs] = fits_wt.simulate_pulsing(cells,f);
-fitsOI = fits.get_embryoID(1:2);
-cellsOI = cells.get_embryoID(1:2);
-name = 'char';
-
-time_windows = 10:10:100; % seconds
+pulseOI = pulse(1:5);
+name = 'wt';
 
 clear neighbor_definition
-neighbor_definition.temporal.def = @(time_diff,tau) abs(time_diff) < tau & time_diff > 0;
+time_windows = 60; % seconds
+neighbor_definition.temporal.def = ...
+    @(time_diff,tau) abs(time_diff) < tau & time_diff > 0;
+
 neighbor_definition.temporal.windows = time_windows;
 neighbor_definition.spatial.def = 'identity';
 % neighbor_definition.spatial.threshold = 8;
 
-fitsOI = fitsOI.find_near_fits(cellsOI,neighbor_definition);
-
-nearIDs = cat(1,fitsOI.nearIDs);
-near_angles = cat(1,fitsOI.near_angles);
+pulseOI.find_near_fits(neighbor_definition);
+nearIDs = cat(1,pulseOI.getFits.nearIDs);
 
 % Convert to number of pulses
 num_near = cellfun(@(x) numel(x(~isnan(x))), nearIDs);
@@ -40,7 +35,7 @@ o.filter = 'on';
 %     '_Nboot', num2str(o.Nboot), '_', o.monte_carlo, '_neighborfilt_', o.filter ...
 %     , '_k' num2str(num_clusters)];
 
-MC = monte_carlo_pulse_location(fitsOI,cellsOI, o);
+MC = monte_carlo_pulse_location(pulse(1:5), o);
 
 % end
 
@@ -51,7 +46,7 @@ MC = monte_carlo_pulse_location(fitsOI,cellsOI, o);
 
 % MC = filter_mc(MC_control, [11 12 13 14 15] );
 
-tau = 3;    % neighborhood time window
+tau = 1;    % neighborhood time window
 clear opt temporal_bins
 temporal_bins(1,:) = [-Inf];
 temporal_bins(2,:) = [Inf];

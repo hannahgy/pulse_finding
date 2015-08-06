@@ -31,7 +31,7 @@ index = 0;
 for i = 1:numel(pulse)
     
     f = pulse(i).fits;
-    N = cells.get_embryoID(i).get_adjacency_matrix;
+    N = pulse(i).cells.get_adjacency_matrix;
     
     for j = 1:numel(f)
         

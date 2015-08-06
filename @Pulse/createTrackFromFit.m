@@ -1,4 +1,3 @@
-
 function pulse = createTrackFromFit(pulse,fitID)
 %@Pulse.createTrackFromFit Convert a fitted pulse into an
 %'artificial track'. Useful when dealing with the 'add'
@@ -7,7 +6,10 @@ function pulse = createTrackFromFit(pulse,fitID)
 % USAGE: pulse = pulse.createTrackFromFit(fitID);
 
 fit = pulse.fits.get_fitID(fitID);
+
 if isempty(fit), display('No FIT found with fitID.'); return; end
+
+% Check that this Fitted was not already used to crate a Track
 if isfield(pulse.changes,'tracksMadeFromFit')
     changes = [pulse.changes.tracksMadeFromFit.fits];
     already_used = zeros(1,numel(changes));
@@ -23,10 +25,9 @@ end
 
 display(['Creating track from fitID ' num2str(fitID)]);
 
-% Add to tracks stack
+% Add to pulse.tracks array
 this_track.embryoID = fit.embryoID;
 this_track.cellID = fit.cellID;
-this_track.stackID = fit.stackID;
 this_track.dev_frame = fit.width_frames;
 this_track.embryoID = fit.embryoID;
 this_track.dev_time = ensure_row(fit.dev_time);
@@ -40,13 +41,13 @@ pulse_new = pulse_new.match_pulse(pulse.match_thresh); % Redo match
 pulse_new = pulse_new.categorize_mapping;
 
 pulse = pulse_new;
-
-pulse.cells([pulse.cells.stackID] == fit.stackID) = ...
-    pulse.cells([pulse.cells.stackID] == fit.stackID ).addTrack( pulse.tracks(end).trackID);
+% Add track to cellobj
+cellOI = pulse.find_cells_with_fit( fit );
+cellOI.addTrack( pulse.tracks(end).trackID);
 
 % Record changes
-c = pulse.cells.get_stackID(fit.stackID);
-[cx,cy,ct] = fit.get_xyt(c);
+c = pulse.find_cells_with_fit(fit);
+[cx,cy,ct] = pulse.get_xyt(fit);
 if isnan(cx), keyboard; end
 
 this_change.tracks.cx = cx;

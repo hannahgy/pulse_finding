@@ -12,7 +12,7 @@ for i = 1:numel(fits)
     fID = fID - old_embryoID*base + embryoID*base;
     fits(i).fitID = fID;
     
-    fits(i).stackID = embryoID*1000 + fits(i).cellID;
+%     fits(i).stackID = embryoID*1000 + fits(i).cellID;
     
 end
 end %rename

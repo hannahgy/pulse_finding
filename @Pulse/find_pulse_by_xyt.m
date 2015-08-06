@@ -1,4 +1,5 @@
-function obj = find_nearest_object(pulse,obj_type,cx,cy,ct)
+function obj = find_pulse_by_xyt(pulse,obj_type,cx,cy,ct)
+%FIND_PULSE_BY_XYT
 % Use centroids, and mean dev_time to robustly find the
 % specified object: 'track' or 'fit'
 
@@ -12,18 +13,18 @@ x = x(cframe,:); y = y(cframe,:);
 d = (x-cx).^2 + (y-cy).^2;
 
 [~,which] = min(d);
-stackID = c(which).stackID;
+% cellID = c(which).cellID;
 
 switch obj_type
     case 'track'
         
-        obj = pulse.tracks.get_stackID(stackID);
+        obj = pulse.find_tracks_from_cell(c(which));
         which = findnearest(cellfun(@nanmean,{obj.dev_time}),ct);
         obj = obj(which);
         
     case 'fit'
         
-        obj = pulse.fits.get_stackID(stackID);
+        obj = pulse.find_fits_from_cell(c(which));
         which = findnearest(cellfun(@nanmean,{obj.dev_time}),ct);
         obj = obj(which);
         

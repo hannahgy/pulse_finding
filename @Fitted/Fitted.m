@@ -73,31 +73,14 @@ classdef Fitted < handle
     %   get_stackID - get all FITs with a certain stackID
     %   get_fitID - get the fit with the given fitID
     %   get_embryoID - get fit with the given embryoID
-    %   get_cluster - get fit with the given behavior
     %   clearCell - clear all records of which pulse belonged to which cell
     % --- Alignment ---
-    %   aling_fits - align the measurement according to the maxima of fits
-    %   assign_datafield - given a matrix, assign each vector to a fit
-    %   resample_traces - re-sample all data in a given fit array so as to
-    %      have the same framerate (See also: INTERP1)
-    %   retrace - re-do the sub-sequence selection
-    %   adjust_centers - adjust Gaussian centers to tref
+    %   adjust_dev_time - adjust Gaussian centers to tref
     %   get_corrected_measurement - temporarily puts given measurement and
     %      returns the aligned, interpolated .corrected_measurement
     % --- Array operations ---
     %   sort - sort according to field (default: amplitude)
     %   bin_fits - bin each embryo by amplitude
-    % --- Analysis ---
-    %   fcm_cluster - cluster the array by a datafield, using Fuzzy c-means
-    %	find_near_fits - find fits near a 'central' fit given a time-window
-    %   bootstrap_cluster_label - intra-embryo exchange of all cluster
-    %      labels
-    %   bootstrap_stackID - intra-embryo exchange of all stackID (includes
-    %      non-pulsing cells - depricated)
-	%   percent_overlap - counts the percentage of overlapping between pulse
-	%      sub-sequences within a cell
-    %   get_myosin_persistence - get the normalized persistence in myosin
-    %      intensity
     % --- Visualization ---
     %   plot_binned_fits
     %   plot_heatmap (sorted)
@@ -116,8 +99,9 @@ classdef Fitted < handle
         % Identifying information
         embryoID
         cellID
-        stackID
+%         stackID
         fitID
+        
         % Pulse-specific data
         amplitude
         center
@@ -188,7 +172,7 @@ classdef Fitted < handle
                 % Collect the relevant indices
                 this_fit.embryoID = cell.embryoID;
                 this_fit.cellID = cell.cellID;
-                this_fit.stackID = cell.stackID;
+%                 this_fit.stackID = cell.stackID;
                 
                 % Collect the parameters
                 this_fit.amplitude = params(1);
@@ -277,28 +261,23 @@ classdef Fitted < handle
 
         equality = eq(fit1,fit2)
         
-% --------------------- Array access --------------------------------------
+% --------------------- Array access for Fitted/CellObj -------------------
+
+        cells = findCell(fit,cells);
         
-        function fits = get_stackID(fit_array,stackID)
-            % Find the FIT(s) with the given stackID(s)
-            % usage: fitsOI = fits.get_stackID(stackID)
-            fits = fit_array( ismember([ fit_array.stackID ], stackID) );
-        end %get_stackID
-        
-        function fits = get_embryoID(fit_array,embryoID)
-            % Find the FIT(s) with the given embryoID(s)
-            % USAGE: fitsOI = fits.get_embryoID(embryoID)
-            fits = fit_array( ismember([ fit_array.embryoID ], embryoID) );
-        end %get_embryoID
+%         function fits = get_cellID(fit_array,cellID)
+%             % Find the FIT(s) with the given cellID(s)
+%             % usage: fitsOI = fits.get_cellID(cellID)
+%             fits = fit_array( ismember([ fit_array.cellID ], cellID) );
+%         end % get_stackID
+
+%         function fits = get_embryoID(fit_array,embryoID)
+%             % Find the FIT(s) with the given embryoID(s)
+%             % USAGE: fitsOI = fits.get_embryoID(embryoID)
+%             fits = fit_array( ismember([ fit_array.embryoID ], embryoID) );
+%         end % get_embryoID
         
         fits = get_fitID(fit_array,fitID);
-        
-        function fits = get_cluster(fits_array,label)
-            % Returns the cluster behavior
-            % USAGE: filtered = fits.get_cluster(1:3)
-            %   ABOVE will return all fits with cluster label 1-3.
-            fits = fits_array( ismember([ fits_array.cluster_label ], label) );
-        end
         
         fit_array = clearCell(fit_array);
         

@@ -29,6 +29,7 @@ for e = 1:numel(pulse)
     % Gather all relevant data into vectors for easy access
     fitsOI = pulse(e).fits;
     cellsOI = pulse(e).cells;
+    
     nPulse = numel(fitsOI);
     fIDs = [fitsOI.fitID];
     cIDs = [fitsOI.cellID];

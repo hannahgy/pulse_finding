@@ -1,15 +1,24 @@
-function [tracks,cells] = load_mdf_track(mdf_matrix,embryo_stack,embryoID,min_frame,cells)
+function tracks = load_mdf_track(mdf_matrix,embryo_struct,min_frame,cells)
 %LOAD_MDF_TRACKS Loads tracked pulses from a MDF matrix into a TRACK
 % object
 %
-% USAGE: tracks = load_mdf_track(mdf_matrix,embryo_stack,thresh4match,cells)
+% USAGE: tracks = load_mdf_track(mdf_matrix,embryo_struct,min_frame,cells)
+%
+% INPUT: MDF_MATRIX - output of READ_MDF
+%        EMBYRO_STRUCT - 1 single structure of the EDGE output (see
+%           LOAD_EDGE_DATA)
+%        MIN_FRAME_OVERLAP - mininum overlap b/w track and fit to call a
+%           match between them (e.g. 2 frame)
+%        cells - CellObj array to map everything onto.
 %
 % See also TRACK, INPOLYGON
 % xies@mit.edu
 
-num_cells = [embryo_stack.num_cell];
-% Extract single embryo structure
-embryo_struct = embryo_stack(embryoID);
+assert( numel(embryo_struct) == 1, 'Only 1 embryo_struct please.');
+assert( embryo_struct.input.embryoID == unique([cells.embryoID]), ...
+    'EmbryoID must be the same from embryo_struct to CellObjs.');
+
+num_cells = numel(cells);
 
 % Load time, cell number, and input from embryo_struct
 dev_time = embryo_struct.dev_time;
@@ -25,7 +34,7 @@ cy = squeeze( embryo_struct.centroid_y ) / input.um_per_px;
 % Get the number of tracks in the matrix
 num_tracks = max(unique(mdf_matrix(:,1)));
 % Construct padded num_cell count for setting correct stackID
-num_cell_pad = cumsum([0 num_cells]);
+% num_cell_pad = cumsum([0 num_cells]);
 
 % clear cells records
 for i = 1:numel(cells)
@@ -73,7 +82,7 @@ for i = 1:num_tracks
 
 	found = 0; index = 0;
 	% Try until an overlapping cell is found using INPOLYGON
-	while ~found && index < num_cells(input.embryoID)
+	while ~found && index < num_cells
 		% Check if track center is within cell
 		index = index + 1;
 		found = inpolygon( track_cx,track_cy,...
@@ -88,33 +97,30 @@ for i = 1:num_tracks
 	% Collect relevant information into track struct
     this_track.embryoID = input.embryoID; this_track.mdfID = i;
     this_track.cellID = order(index);
-    this_track.stackID = 1000*(embryoID) + order(index);
+%     this_track.stackID = 1000*(embryoID) + order(index);
 
 	% Collect the time/frame of track WRT aligned developmental time
     frames( frames > numel(dev_time) ) = [];
 	this_track.dev_frame = ensure_row(frames);
 	this_track.dev_time = dev_time(frames);
-    % Collect the frames WRT image time
-%     this_track.img_frame = img_frame;
     
+    % Update track info in CellObj (by reference)
+	cells(order(index)).flag_tracked = 1;
+    cells(order(index)).num_tracks = cells(order(index)).num_tracks + 1;
 	% Construct Track object
-	cells([cells.stackID] == this_track.stackID).flag_tracked = 1;
-    cells([cells.stackID] == this_track.stackID).num_tracks = cells(order(index)).num_tracks + 1;
-	
+    
 	tracks(trackID) = Track(this_track);
 
 end
 
-% filter out non-fitted cells
+% Filter out Tracks mapped onto non-fitted cells
+unfit_cells = cells(~[cells.flag_fitted]);
+tracks(ismember([tracks.cellID],[unfit_cells.cellID])) = [];
 
-tracked_cells = [unique([tracks.stackID])];
-unfit_cells = tracked_cells( ~[cells.get_stackID(tracked_cells).flag_fitted] );
-[tracks(ismember([tracks.stackID],unfit_cells))] = [];
-
-for i = 1:numel(tracks)
-    tracks(i).trackID = i + input.embryoID*1000;
-    cells( [cells.stackID] == tracks(i).stackID ).trackID = ...
-        [cells( [cells.stackID] == tracks(i).stackID ).trackID i + input.embryoID*1000];
-end
+% for i = 1:numel(tracks)
+%     tracks(i).trackID = i + input.embryoID*1000;
+% %     cells( [cells.stackID] == tracks(i).stackID ).trackID = ...
+% %         [cells( [cells.stackID] == tracks(i).stackID ).trackID i + input.embryoID*1000];
+% end
 
 end

@@ -1,7 +1,6 @@
-function [new_cells,fit] = fit_gaussians(cells,opts)
+function fit = fit_gaussians(cells,opts)
 %FIT_GAUSSIANS Fit multiple-Gaussians with a F-test stop
 % Uses LSQCURVEFIT
-% Might try
 
 num_embryos = numel(unique([cells.embryoID]));
 num_cells = hist([cells.embryoID],1:num_embryos);
@@ -80,7 +79,7 @@ for i = 1:sum(num_cells)
             % Assign fitID
             fitID = fitID + 1;
             
-            embryo_fitID = fitID + this_cell.embryoID*1000;
+            embryo_fitID = fitID;
             
             fit = [fit Fitted(this_cell, gauss_p(:,j), embryo_fitID, opt)];
             
@@ -107,7 +106,7 @@ for i = 1:sum(num_cells)
         this_cell.opt = NaN;
     end
     
-    new_cells(i) = this_cell;
+%     new_cells(i) = this_cell;
     last_embryoID = this_cell.embryoID;
     
     display(['Done with cell #', num2str(stackID)])

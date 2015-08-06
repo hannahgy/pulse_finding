@@ -1,5 +1,4 @@
-
-function visualize(cells,ID,handle)
+function visualize(this_cell,handle)
 %VISUALIZE_CELL Plots the raw area and myosin data for a given cell as well
 % as its fitted pulses, if applicable.
 %
@@ -7,14 +6,13 @@ function visualize(cells,ID,handle)
 %
 % xies@mit.edu Feb 2013
 
-% Extract cell
-this_cell = cells.get_stackID(ID);
+assert(numel(this_cell) == 1, 'Can only visualize one cell at a time.');
 
 nonan_frame = this_cell.dev_time;
 nonan_frame = ~isnan(nonan_frame);
 time = this_cell.dev_time( nonan_frame );
 
-if nargin < 3, handle = gca; end
+if nargin < 2, handle = gca; end
 
 % Plot raw data: myosin + area
 [h,fig1,fig2] = plotyy(handle, time, this_cell.myosin_intensity(nonan_frame), ...

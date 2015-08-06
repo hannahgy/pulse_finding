@@ -1,4 +1,4 @@
-function X = fcm_cluster(pulse,k,datafield,max_nan)
+function X = fcm_cluster(pulse,k,datafield,max_nan,varargin)
 %FCM_CLUSTER Uses fuzzy c-means to cluster a given datafield in
 % the fit_array. In order to standardize the cluster naming
 % schematic, user needs to input an order vector.
@@ -26,12 +26,15 @@ filtered = fits(...
     cellfun(@(x) numel(x(isnan(x))),{fits.(datafield)}) < max_nan );
 
 X = cat(1,filtered.(datafield));
+if nargin > 4
+    X = cat(X,varargin{1});
+end
 X = bsxfun(@minus,X,nanmean(X));
 X = bsxfun(@rdivide,X,nanstd(X,[],2));
 
 X(isnan(X)) = 0;
 
-[cluster_centroid,U] = fcm(X,k,[2 1e4 1e-5 1]);
+[cluster_centroid,U] = fcm(X,k,[2 1e3 1e-5 1]);
 [max_prob, labels] = max(U);
 
 for i = 1:k

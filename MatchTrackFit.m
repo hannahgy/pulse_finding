@@ -55,7 +55,7 @@ classdef MatchTrackFit
                     this_ref = ref(i);
                     if ~valid_pulse(this_ref,ref_field,threshold), continue; end
                     
-                    candidates = comp( [comp.stackID] == this_ref.stackID );
+                    candidates = comp( [comp.cellID] == this_ref.cellID );
                     
                     if isempty(candidates), continue; end
                     
@@ -79,7 +79,7 @@ classdef MatchTrackFit
                 end
                 
                 function flag2cont = valid_pulse(ref,ref_field,thresh)
-                    flag2cont = ~any([isnan(ref.cellID) isnan(ref.embryoID) isnan(ref.stackID)]);
+                    flag2cont = ~any([isnan(ref.cellID) isnan(ref.embryoID)]);
                     flag2cont = flag2cont || numel(ref.(ref_field)) < thresh + 1;
                 end
                 

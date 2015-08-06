@@ -1,4 +1,3 @@
-
 function pulse = createFitFromTrack(pulse,trackID,opt)
 %@Pulse.createFitFromTrack Using the stackID/embryoID and timing to create an
 % artificial 'fit'.
@@ -9,11 +8,11 @@ function pulse = createFitFromTrack(pulse,trackID,opt)
 cells = pulse.cells;
 
 % Extract track / make sure it's not duplicated
-track = pulse.tracks.get_trackID(trackID);
-c = cells.get_stackID(track.stackID);
+track = pulse.get_trackID(trackID);
+c = pulse.get_cellID(track.cellID);
 if isempty(track), display('Cannot create FIT: No track with trackID found.'); return; end
 
-[cx,cy,ct] = track.get_xyt(c);
+[cx,cy,ct] = pulse.get_xyt(track);
 
 if isfield(pulse.changes,'fitsMadeFromTrack');
     foo = [pulse.changes.fitsMadeFromTrack.tracks];
@@ -52,7 +51,7 @@ if ~isempty(I)
 else
     % Launch the manual fit GUI
     params = manual_fit( ...
-        [nanmean(track.dev_time) 20],cells,track.stackID);
+        [nanmean(track.dev_time) 20],c);
 end
 
 % Construct a new FITTED object from parameters
@@ -72,13 +71,14 @@ pulse = pulse.match_pulse(pulse.match_thresh);
 pulse = pulse.categorize_mapping;
 
 % Update cell tracklist
-pulse.cells( [pulse.cells.stackID] == track.stackID ) = ...
-    pulse.cells( [pulse.cells.stackID] == track.stackID).addFit( pulse.fits(end));
+% pulse.cells( [pulse.cells.stackID] == track.stackID ) = ...
+%     pulse.cells( [pulse.cells.stackID] == track.stackID).addFit( pulse.fits(end));
+c.addFit(pulse.fits(end));
 
 % Record changes
 %             this_change.fitID = pulse.fits(end).fitID;
 %             this_change.trackID = trackID;
-[cx,cy,ct] = track.get_xyt(c);
+[cx,cy,ct] = pulse.get_xyt(track);
 this_change.fits.cx = cx;
 this_change.fits.cy = cy;
 this_change.fits.ct = ct;

@@ -1,4 +1,3 @@
-
 function pulse = removePulse(pulse,type,pulseID)
 %@Pulse.removePulse Remove pulse from track-fit mapping, as well as
 % the respective pulse object array.
@@ -22,9 +21,9 @@ switch type
         % centroid + developmental time
         
         fit = pulse.fits.get_fitID( pulseID );
-        c = c.get_stackID( fit.stackID );
+%         c = pulse.find_cells_with_fit( fit );
         
-        [cx,cy,ct] = fit.get_xyt(c);
+        [cx,cy,ct] = pulse.get_xyt(fit);
         
         % Record b/f removal -- instead of its ID, use [cx,cy,ct]
         if isfield(pulse.changes,'fitsRemoved')
@@ -37,10 +36,9 @@ switch type
             pulse.changes.fitsRemoved.fits.ct = ct;
         end
         
-        % Remove from cell obj
-        stackID = [pulse.fits.get_fitID(pulseID).stackID];
-        pulse.cells( [pulse.cells.stackID] == stackID ) = ...
-            pulse.cells( [pulse.cells.stackID] == stackID ).removeFit(pulseID);
+        % Remove Fit/Track from cell obj
+        this_fit = pulse.fits.get_fitID(pulseID);
+        pulse.find_cells_with_fit(this_fit).removeFit(this_fit);
         
         % Remove from fits stack
         pulse.fits = pulse.fits.removeFit( pulseID );
@@ -57,10 +55,10 @@ switch type
         
         % get a copy of to be deleted TRACK and record its
         % centroid + developmental time
-        track = pulse.tracks.get_trackID( pulseID );
-        c = c.get_stackID( track.stackID );
+        track = pulse.get_trackID( pulseID );
+%         c = c.get_stackID( track.stackID );
         
-        [cx,cy,ct] = track.get_xyt(c);
+        [cx,cy,ct] = pulse.get_xyt(track);
         
         % Record b/f removal - [cx,cy,ct]
         if isfield(pulse.changes,'tracksRemoved')
@@ -74,10 +72,10 @@ switch type
         end
         
         % Remove from CellObj
-        stackID = [pulse.tracks(indices).stackID];
-        for i = 1:numel(stackID)
-            pulse.cells( [pulse.cells.stackID] == stackID(i)) = ...
-                pulse.cells( [pulse.cells.stackID] == stackID(i)).removeTrack(pulseID);
+        cellID = [pulse.tracks(indices).cellID];
+        for i = 1:numel(cellID)
+            cellOI = pulse.get_cellID(cellID);
+            cellOI.removeTrack(pulseID);
         end
         % Remove from track stack
         pulse.tracks( indices ) = [];

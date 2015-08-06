@@ -1,7 +1,14 @@
-function binary = make_binary_sequence(cells,fits)
+function binary = make_binary_sequence(pulse)
 %MAKE_BINARY_SEQUENCE Uses width_frames to generate a binary
 % sequence of pulses
-% USAGE: binary_seq = cells.make_binary_sequence(fits);
+% USAGE: binary_seq = pulse.make_binary_sequence;
+
+if numel(pulse) > 1
+    error('Only 1 Pulse at a time.');
+end
+
+cells = [pulse.cells];
+fits = [pulse.fits];
 
 % Preallocate
 binary = zeros( numel(cells(1).dev_time), max( [cells.cellID] ));

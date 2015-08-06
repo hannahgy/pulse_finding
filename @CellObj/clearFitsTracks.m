@@ -18,8 +18,8 @@ for i = 1:numel(obj_array)
     cellOI.num_fits = 0;
     cellOI.num_tracks = 0;
     
-    cellOI.fitID = [];
-    cellOI.trackID = [];
+    cellOI.fitID = NaN;
+    cellOI.trackID = NaN;
     
     obj_array(i) = cellOI;
     

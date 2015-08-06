@@ -42,7 +42,7 @@ classdef Track < handle
 
         embryoID % which embryo in stack
         cellID	% EDGE ID for cell
-        stackID % index in cell stack
+%         stackID % index in cell stack
         mdfID 	% Original track index from MtrackJ
         
         dev_frame % The active track frames in aligned frame
@@ -71,16 +71,16 @@ classdef Track < handle
             end
         end % constructor
 % --------------------- Search methods -----------------------------------
-        function objs = get_trackID(obj_array,trackID)
-            if nargin < 2, objs = []; return; end
-            % search for and return the TRACKs with the given trackID(s)
-            objs = obj_array( ismember([obj_array.trackID],trackID) );
-        end %get_trackID
-        
-        function objs = get_stackID(obj_array,stackID)
-            % search for and return the TRACKs with the given trackID(s)
-            objs = obj_array( ismember([obj_array.stackID],stackID) );
-        end %get_stackID
+%         function objs = get_trackID(obj_array,trackID)
+%             if nargin < 2, objs = []; return; end
+%             % search for and return the TRACKs with the given trackID(s)
+%             objs = obj_array( ismember([obj_array.trackID],trackID) );
+%         end %get_trackID
+%         
+%         function objs = get_stackID(obj_array,stackID)
+%             % search for and return the TRACKs with the given trackID(s)
+%             objs = obj_array( ismember([obj_array.stackID],stackID) );
+%         end %get_stackID
         
 % --------------------- Comparator ---------------------------------------   
         function equality = eq(track1,track2)
@@ -125,55 +125,56 @@ classdef Track < handle
             
             obj_array = [obj_array new_track];
         end
-		function obj_array = reindex_trackID( obj_array, new_embryoID)
-			% Reindex_trackID Given a track array of the same embryoID, and
-			% a new_embryoID, re-index the trackIDs of the array with a set
-			% of new identifiers beginning with the new_embryoID
-			
-			old_embryoID = obj_array(1).embryoID;
-			if any( [obj_array.embryoID] ~= old_embryoID )
-				error('Must input an array with the same original embryoID');
-			end
-			
-			old_trackIDs = [obj_array.trackID];
-			new_trackIDs = old_trackIDs;
-			new_trackIDs = new_trackIDs + (new_embryoID - old_embryoID)*1000;
-
-		end	% reindex_trackID
+% 		function obj_array = reindex_trackID( obj_array, new_embryoID)
+% 			% Reindex_trackID Given a track array of the same embryoID, and
+% 			% a new_embryoID, re-index the trackIDs of the array with a set
+% 			% of new identifiers beginning with the new_embryoID
+% 			
+% 			old_embryoID = obj_array(1).embryoID;
+% 			if any( [obj_array.embryoID] ~= old_embryoID )
+% 				error('Must input an array with the same original embryoID');
+% 			end
+% 			
+% 			old_trackIDs = [obj_array.trackID];
+% 			new_trackIDs = old_trackIDs;
+% 			new_trackIDs = new_trackIDs + (new_embryoID - old_embryoID)*1000;
+% 
+% 		end	% reindex_trackID
         
 % --------------------- Singleton operations ------------------------------
-        function [cx,cy,ct] = get_xyt(track,cell)
-            validateattributes(track,{'Track'},{'scalar'});
-            validateattributes(cell,{'CellObj'},{'scalar'});
-
-            cframe = findnearest(nanmean(track.dev_time),cell.dev_time);
-            if numel(cframe) > 1, cframe = cframe(1); end
-            cx = cell.centroid_x(cframe);
-            cy = cell.centroid_y(cframe);
-            if any(isnan([cx cy]))
-                cframe = find_nearest_nonan(cell.centroid_x,cframe);
-                
-                cx = cell.centroid_x(cframe);
-                cy = cell.centroid_y(cframe);
-            end
-            
-            ct = nanmean(track.dev_time);
-            
-        end
+%         function [cx,cy,ct] = get_xyt(track,cell)
+%             validateattributes(track,{'Track'},{'scalar'});
+%             validateattributes(cell,{'CellObj'},{'scalar'});
+% 
+%             cframe = findnearest(nanmean(track.dev_time),cell.dev_time);
+%             if numel(cframe) > 1, cframe = cframe(1); end
+%             cx = cell.centroid_x(cframe);
+%             cy = cell.centroid_y(cframe);
+%             if any(isnan([cx cy]))
+%                 cframe = find_nearest_nonan(cell.centroid_x,cframe);
+%                 
+%                 cx = cell.centroid_x(cframe);
+%                 cy = cell.centroid_y(cframe);
+%             end
+%             
+%             ct = nanmean(track.dev_time);
+%             
+%         end
         
         function track = rename_embryoID(track,new_embryoID)
+            %RENAME_EMBRYOID
             old_embryoID = track.embryoID;
             for i = 1:numel(track)
                 track(i).trackID = ...
                     track(i).trackID + (new_embryoID - old_embryoID) * 1000;
                 track(i).embryoID = new_embryoID;
-                track(i) = track(i).rename_stackID;
+%                 track(i) = track(i).rename_stackID;
             end
         end
         
-        function track = rename_stackID(track)
-            track.stackID = track.embryoID*1000 + track.cellID;
-        end
+%         function track = rename_stackID(track)
+%             track.stackID = track.embryoID*1000 + track.cellID;
+%         end
         
     end
 

@@ -61,7 +61,7 @@ for i = 1:num_fits
         
         
         m( lb: ub) = ensure_row( ...
-            cells.get_stackID(this_fit.stackID).(cell_name)( frames ));
+            pulse.find_cells_with_fit(this_fit).(cell_name)( frames ));
         
     end
     

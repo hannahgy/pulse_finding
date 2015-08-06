@@ -10,7 +10,8 @@ fits = [pulse.fits]; cells = [pulse.cells];
 for i = 1:numel(fits)
     
     this_fit = fits(i);
-    this_cell = cells.get_stackID(this_fit.stackID);
+    % Find corresponding cell
+    this_cell = pulse.find_cells_with_fit(this_fit);
     
     num_frames = numel(nonans(this_cell.dev_time));
     newOpt = opts(this_fit.embryoID);

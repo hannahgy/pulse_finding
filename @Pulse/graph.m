@@ -1,4 +1,3 @@
-
 function varargout = graph(pulse,cat,ID,axes_handle)
 % Graph the selected cateogry
 % USAGE: pulse.graph(category,ID,handles)
@@ -10,7 +9,7 @@ function varargout = graph(pulse,cat,ID,axes_handle)
 %        axes_handle - subplot axes
 
 % get the data
-fits = pulse.fits; tracks = pulse.tracks; cells = pulse.cells;
+% fits = pulse.fits; tracks = pulse.tracks; cells = pulse.cells;
 
 % find number of things to graph
 category = pulse.categories.(cat);
@@ -26,22 +25,22 @@ for i = 1:num_disp
     trackID = category(ID(i)).trackID;
     % Get stackID
     if ~isempty(trackID)
-        stackID = tracks.get_trackID(trackID(1)).stackID;
+        cellID = pulse.get_trackID(trackID(1)).cellID;
     else
-        stackID = fits.get_fitID(fitID(1)).stackID;
+        cellID = pulse.get_fitID(fitID(1)).cellID;
     end
     
     % Get time (for graphing
-    dev_time = cells.get_stackID(stackID).dev_time;
+    cellOI = pulse.get_cellID(cellID);
+    dev_time = cellOI.dev_time;
     dev_time = dev_time(~isnan(dev_time));
     
     % Extract fit/track of interest
-    track = tracks.get_stackID(stackID); num_track = numel(track);
-    fit = fits.get_stackID(stackID ); num_fit = numel(fit);
+    track = pulse.find_tracks_from_cell(cellOI); num_track = numel(track);
+    fit = pulse.find_fits_from_cell(cellOI); num_fit = numel(fit);
     
     % --- Plot tracked pulses ---
     % handle subplots, plot to alternative parent if applicable
-    
     h(1) = subplot(3, num_disp, i, 'Parent', axes_handle);
     
     %                 axes(h(1));
@@ -87,14 +86,14 @@ for i = 1:num_disp
     % --- Plot cell raw data ---
     h(3) = subplot(3, num_disp, 2*num_disp + i, 'Parent', axes_handle);
     
-    cells.visualize( stackID, h(3) );
+    cellOI.visualize( h(3) );
     linkaxes( h , 'x');
     
 end % End of for-loop
 
 if nargout > 0
-    varargout{1} = [tracks.get_stackID(stackID).trackID];
-    varargout{2} = [fits.get_stackID(stackID).fitID];
+    varargout{1} = [pulse.find_tracks_from_cell(cellOI).trackID];
+    varargout{2} = [pulse.find_fits_from_cell(cellOI).fitID];
 end
 
 % --- Sub functions ---

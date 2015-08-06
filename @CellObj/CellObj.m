@@ -58,7 +58,7 @@ classdef CellObj < handle
     %       get_embryoID - only return embryos of given embryoID
 	%		get_embryoID_cellID - search using embryoID + cellID (useful
     %           coming from EDGE)
-    %       adjust_center - adjust dev_time to reflect new reference time
+    %       adjust_dev_time - adjust dev_time to reflect new reference time
     %       get_nearby - get cells nearby within a given radius
 	%	--- Visualization/display ---
 	%		make_mask - returns a binary BW image of the cell
@@ -159,7 +159,7 @@ classdef CellObj < handle
         
 % ---------------------- Editing fit/tracks -------------------------------
         
-        [new_cells,fit] = fit_gaussians(cells,opts);
+        fit = fit_gaussians(cells,opts);
         
         cellobj = addFit(cellobj,fit);
         cellobj = removeFit(cellobj,fitID);
@@ -169,18 +169,20 @@ classdef CellObj < handle
         
 % --------------------- Array set/access ----------------------------------
         
-        function obj = get_stackID(obj_array, stackID)
-            %@Cell.get_stackID Returns the obj from an array with the given
-            % stackID
-            obj = obj_array( ismember([ obj_array.stackID ],stackID ));
-        end % get_stackID
+%         function obj = get_stackID(obj_array, stackID)
+%             %@Cell.get_stackID Returns the obj from an array with the given
+%             % stackID
+%             obj = obj_array( ismember([ obj_array.stackID ],stackID ));
+%         end % get_stackID
         
-        function obj = get_fitID(obj_array, fitID)
-            %@Cell.get_fitID Returns the obj from an array with the given
-            % fitID
-            obj = obj_array(...
-                cellfun(@(x) (any(x == fitID)),{obj_array.fitID}) );
-        end % get_fitID
+%         function obj = get_fitID(obj_array, fitID)
+%             %@Cell.get_fitID Returns the obj from an array with the given
+%             % fitID
+%             obj = obj_array(...
+%                 cellfun(@(x) (any(x == fitID)),{obj_array.fitID}) );
+%         end % get_fitID
+
+        fits = getFits(cells,fits);
         
         function obj = get_trackID(obj_array, trackID)
             %@Cell.get_fitID Returns the obj from an array with the given
@@ -188,16 +190,16 @@ classdef CellObj < handle
             obj = obj_array([obj_array.trackID] == trackID);
         end % get_trackID
         
-        function obj = get_embryoID(obj_array,embryoID)
-            obj = obj_array(ismember([obj_array.embryoID],embryoID));
-        end % get_embryoID
+%         function obj = get_embryoID(obj_array,embryoID)
+%             obj = obj_array(ismember([obj_array.embryoID],embryoID));
+%         end % get_embryoID
         
-        function obj = get_embryoID_cellID(obj_array,embryoID,cellID)
-            obj = obj_array( ...
-                [obj_array.embryoID] == embryoID & ...
-                ismember([obj_array.cellID], cellID) ...
-                );
-        end % get_embryoID_cellID
+%         function obj = get_embryoID_cellID(obj_array,embryoID,cellID)
+%             obj = obj_array( ...
+%                 [obj_array.embryoID] == embryoID & ...
+%                 ismember([obj_array.cellID], cellID) ...
+%                 );
+%         end % get_embryoID_cellID
         
         function obj = get_curated(obj_array)
             obj = obj_array([obj_array.flag_tracked] == 1 & ...
@@ -207,7 +209,7 @@ classdef CellObj < handle
         nearby_cells = get_nearby(obj_array,stackID,radius,reference_frame);
         update_measurements(cells,embryo_stack);
         
-        function cells = adjust_dev_time(cells, old_tref, new_tref, dt)
+        function adjust_dev_time(cells, old_tref, new_tref, dt)
             %ADJUST_DEV_TIME Recalculate dev_time according to new .tref
             % Properties that will be adjusted:
             %   dev_time
@@ -257,7 +259,7 @@ classdef CellObj < handle
         
         mask = make_mask(obj_array, frames, input);
         [x,y] = make_polygon(obj_array,t,input,filename);
-        visualize(cells,ID,handle);
+        visualize(cell,handle);
         H = plot_aligned(cells,name2plot,varargin)
         M = movie(cells,stackID,embryo_stack);
         

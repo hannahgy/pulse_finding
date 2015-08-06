@@ -1,4 +1,4 @@
-function fig = plot_single_pulse(fit,fitID)
+function fig = plot_single_pulse(pulse,fitID)
 % PLOT_SINGLE_PULSE Plot the myosin and area time-series for a
 % single pulse.
 %
@@ -6,11 +6,14 @@ function fig = plot_single_pulse(fit,fitID)
 %   fit.plot_single_pulse;
 %   fits.plot_single_pulse(fitID)
 
-if numel(fit) == 1
-    fitID = fit.fitID;
-else
-    fit = fit.get_fitID(fitID);
-end
+% fit = [pulse.fits];
+fit = pulse.get_fitID(fitID);
+assert( numel(fit) == 1, 'Fit not found!')
+% if numel(fit) == 1
+%     fitID = fit.fitID;
+% else
+%     fit = fit.get_fitID(fitID);
+% end
 
 %             fig = figure;
 fig = gcf;
